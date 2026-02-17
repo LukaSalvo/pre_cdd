@@ -1,0 +1,122 @@
+BUT informatique 3A,
+parcours DACS
+SAÉ de projet tuteuré
+
+Déploiement d’une application / LDAP
+Février 2026
+
+1
+
+Objectif
+
+L’objectif de ce projet est de se familiariser avec le protocole LDAP (Lightweight Directory Access Protocol), de
+comprendre son fonctionnement et ses usages, puis de mettre en pratique ces connaissances dans un contexte réel,
+celui de l’annuaire de l’Université de Lorraine. Le projet se termine par le déploiement d’une application existante
+(cette dernière partie sera précisée ultérieurement).
+Le projet se déroule en trois étapes progressives :
+1. découverte de LDAP et raccordement à un serveur public de test via un script Ruby,
+2. raccordement au serveur LDAP de l’Université de Lorraine,
+3. déploiement d’une application existante.
+Le travail s’effectue par groupe de 3 étudiants. Ce sujet est également un prétexte pour approfondir vos connaissances sur le protocole LDAP et les problématiques d’authentification et d’annuaire en entreprise. Il est vivement
+conseillé de profiter de cette occasion pour « creuser » les concepts utilisés. L’environnement Linux est obligatoire
+pour les travaux demandés.
+L’évaluation finale se composera du rendu des ressources demandées ainsi qu’une mini-soutenance pour répondre
+du travail réalisé et de la culture générale technique sous-jacente.
+
+2
+
+Descriptif des étapes à réaliser
+
+1 Découverte de LDAP et raccordement à un serveur de test
+Objectif : comprendre le fonctionnement général du protocole LDAP et réaliser un raccordement depuis une
+application Rails.
+Travail préliminaire : comprendre LDAP
+
+Avant toute chose, il est demandé de se documenter sur le protocole LDAP afin de comprendre :
+— les concepts fondamentaux : annuaire, entrées, attributs, DN (Distinguished Name), Base DN, bind,
+— la structure arborescente d’un annuaire LDAP (DIT – Directory Information Tree),
+— les opérations courantes : bind, search, compare, add, modify, delete,
+— les différences entre LDAP (port 389) et LDAPS (port 636),
+— les cas d’usage typiques en entreprise (authentification centralisée, annuaire d’entreprise, gestion des droits).
+1
+
+Tests de raccordement avec un serveur public
+
+Pour les premiers tests, un serveur LDAP public gratuit sera utilisé. Ce serveur est l’un des plus connus pour les
+tests LDAP :
+Serveur
+Port
+Bind DN
+Mot de passe
+
+ldap.forumsys.com
+
+389 (LDAP non sécurisé)
+cn=read-only-admin,dc=example,dc=com
+password
+
+Il est également possible de s’authentifier (bind) avec des utilisateurs standards tels que uid=einstein,dc=example,dc=com,
+uid=tesla,dc=example,dc=com, etc. Tous les mots de passe de ce serveur de test sont password.
+Travaux demandés :
+1. Commencer par tester le raccordement LDAP en ligne de commande (ldapsearch) afin de valider la connectivité
+et explorer la structure de l’annuaire.
+2. Développer un script Ruby simple se raccordant à ce serveur LDAP. le script n’a pas besoin d’avoir de fonctionnalité particulière : il s’agit avant tout de tester le raccordement. Il peut toutefois être intéressant d’y intégrer
+une gestion des utilisateurs afin de mieux comprendre, directement depuis l’application, les interactions avec
+le serveur LDAP et la nature des informations échangées et récupérées.
+3. Documenter les gems Ruby utilisées pour le raccordement LDAP, les configurations nécessaires et les éventuelles difficultés rencontrées.
+Pour l’environnement technique, utiliser les versions de logiciels disponibles sur la machine de développement.
+
+2 Raccordement au LDAP de l’Université de Lorraine
+Objectif : réaliser un raccordement LDAP dans un contexte réel, celui de l’annuaire de l’Université de Lorraine.
+Informations de connexion
+
+Interrogé sur les possibilités de raccordement au LDAP de l’Université de Lorraine, l’administrateur a fourni les
+éléments suivants :
+— Serveurs disponibles :
+— ldaps://montet-dc1.ad.univ-lorraine.fr:636
+— ldaps://montet-dc2.ad.univ-lorraine.fr:636
+— Authentification : avec son compte UL, sous la forme login@univ-lorraine.fr.
+— Base DN pour les personnels :
+OU=Personnels,OU=_Utilisateurs,OU=UL,DC=ad,DC=univ-lorraine,DC=fr
+
+— L’adresse mail est disponible dans l’attribut mail des utilisateurs.
+— Pour connaître la structure de rattachement, il faut consulter l’attribut memberOf et y chercher :
+— GGA_STP_FHB– → IUTNC
+— GGA_STP_FHBAB → Département Informatique
+Travaux demandés
+
+1. Réaliser un script Ruby constituant un proof of concept (PoC) de la connexion au LDAP de l’Université de
+Lorraine. Ce script devra être capable de :
+— se connecter (bind) au serveur LDAPS de l’UL,
+— effectuer une recherche dans l’annuaire des personnels,
+— afficher des informations pertinentes (nom, mail, rattachement structurel).
+2
+
+2. Précaution importante concernant le mot de passe. Le script nécessite l’utilisation de votre mot de passe UL
+personnel pour réaliser le bind. Il est impératif de prendre les précautions suivantes :
+— le mot de passe ne doit jamais apparaître en clair dans le code source,
+— utiliser une variable d’environnement (ex. : ENV[’LDAP_PASSWORD’]) ou un fichier de configuration local non
+versionné (ajouté au .gitignore),
+— ne jamais commiter le mot de passe dans le dépôt Git (vérifier l’historique des commits en cas d’erreur),
+— documenter clairement dans le README la procédure à suivre pour configurer le mot de passe avant exécution
+du script.
+3. Documenter les différences observées par rapport au serveur de test public (protocole LDAPS vs LDAP, structure de l’annuaire, format des DN, etc.).
+
+3 Déploiement d’une application existante
+À compléter ultérieurement.
+
+3
+
+Résultats attendus
+— Un dépôt Git contenant le code de l’application Rails (raccordement au serveur de test) et le script Ruby de
+PoC (raccordement au LDAP UL).
+— Une documentation en Markdown comprenant :
+— une synthèse sur le protocole LDAP (concepts, fonctionnement, usages),
+— le détail du raccordement réalisé avec le serveur de test,
+— le détail du raccordement au LDAP de l’UL et les points intéressants à considérer pour ce type de raccordement,
+— les instructions de déploiement et d’utilisation.
+— Une démonstration du résultat obtenu lors de la mini-soutenance.
+
+3
+
+
