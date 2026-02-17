@@ -29,8 +29,8 @@ ldap = Net::LDAP.new(ldap_config)
 if ldap.bind
   puts "Authentification reussie"
   
-  # Recherche dans OU=_Utilisateurs pour inclure tout le monde (Personnel et Etudiants)
-  base_dn = 'OU=_Utilisateurs,OU=UL,DC=ad,DC=univ-lorraine,DC=fr'
+  # Recherche dans OU=UL pour inclure Personnels, Etudiants et autres sous-dossiers
+  base_dn = 'OU=UL,DC=ad,DC=univ-lorraine,DC=fr'
   
   # Si un argument est passé, on recherche cet utilisateur, sinon on cherche l'utilisateur connecté
   search_term = ARGV[0] || username
@@ -38,7 +38,9 @@ if ldap.bind
   
   puts "Recherche des details de l'utilisateur '#{search_term}' dans #{base_dn}..."
   
+  count = 0
   ldap.search(base: base_dn, filter: filter) do |entry|
+    count += 1
     puts "Utilisateur trouve: #{entry.dn}"
     puts "Nom: #{entry.cn.first}" if entry.cn
     puts "Email: #{entry.mail.first}" if entry.mail
@@ -57,6 +59,8 @@ if ldap.bind
     
     puts "-" * 20
   end
+  
+  puts "Aucun utilisateur trouve." if count == 0
   
   if ldap.get_operation_result.code != 0
     puts "Echec de la recherche: #{ldap.get_operation_result.message}"
