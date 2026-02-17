@@ -29,8 +29,8 @@ ldap = Net::LDAP.new(ldap_config)
 if ldap.bind
   puts "Authentification reussie"
   
-  # On élargit la recherche à tous les utilisateurs (Personnels et Etudiants)
-  base_dn = 'OU=_Utilisateurs,OU=UL,DC=ad,DC=univ-lorraine,DC=fr'
+  # Recherche depuis la racine pour être sûr de trouver l'utilisateur peu importe son OU (Etudiant, Personnel, etc.)
+  base_dn = 'DC=ad,DC=univ-lorraine,DC=fr'
   filter = Net::LDAP::Filter.eq('sAMAccountName', username)
   
   puts "Recherche des details de l'utilisateur dans #{base_dn}..."
