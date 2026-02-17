@@ -27,20 +27,14 @@ puts "Connexion a #{ldap_config[:host]} en tant que #{username}..."
 ldap = Net::LDAP.new(ldap_config)
 
 if ldap.bind
-  # -------------------------------------------------------------------------
-  # BASE DN : Strictement conforme au sujet ("Base DN pour les personnels")
-  # -------------------------------------------------------------------------
-  base_dn = 'OU=Personnels,OU=_Utilisateurs,OU=UL,DC=ad,DC=univ-lorraine,DC=fr'
-  
-  # Si un argument est passé, on recherche cet utilisateur, sinon on cherche l'utilisateur connecté
-  search_term = ARGV[0] || username
 
-  # FILTRE DE RECHERCHE : ON CHERCHE SOIT PAR LOGIN (sAMAccountName) SOIT PAR NOM COMPLET (cn)
-  # Exemple : ruby ldap_univ_poc.rb "Jean DUPONT"  ou  ruby ldap_univ_poc.rb dupont12
-  filter = Net::LDAP::Filter.eq('sAMAccountName', search_term) | Net::LDAP::Filter.eq('cn', search_term)
+  base_dn = 'OU=_Utilisateurs,OU=UL,DC=ad,DC=univ-lorraine,DC=fr'
   
-  puts "Recherche dans l'Annuaire PERSONNELS (Base DN du sujet)..."
-  puts "Terme recherche: '#{search_term}'"
+  search_term = (ARGV[0] || username).strip
+
+  filter = Net::LDAP::Filter.eq('sAMAccountName', search_term)
+  
+  puts "Recherche de l'utilisateur '#{search_term}' dans #{base_dn}..."
   
   count = 0
   ldap.search(base: base_dn, filter: filter) do |entry|
