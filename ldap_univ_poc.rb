@@ -30,7 +30,7 @@ if ldap.bind
   puts "Authentification reussie"
   
   # Recherche dans OU=UL pour inclure Personnels, Etudiants et autres sous-dossiers
-  base_dn = 'OU=UL,DC=ad,DC=univ-lorraine,DC=fr'
+  base_dn = 'OU=Personnels,OU=_Utilisateurs,OU=UL,DC=ad,DC=univ-lorraine,DC=fr'
   
   # Si un argument est passé, on recherche cet utilisateur, sinon on cherche l'utilisateur connecté
   search_term = ARGV[0] || username
