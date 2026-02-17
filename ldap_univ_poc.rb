@@ -29,11 +29,14 @@ ldap = Net::LDAP.new(ldap_config)
 if ldap.bind
   puts "Authentification reussie"
   
-  # Recherche depuis la racine pour être sûr de trouver l'utilisateur peu importe son OU (Etudiant, Personnel, etc.)
-  base_dn = 'DC=ad,DC=univ-lorraine,DC=fr'
-  filter = Net::LDAP::Filter.eq('sAMAccountName', username)
+  # Recherche dans OU=_Utilisateurs pour inclure tout le monde (Personnel et Etudiants)
+  base_dn = 'OU=_Utilisateurs,OU=UL,DC=ad,DC=univ-lorraine,DC=fr'
   
-  puts "Recherche des details de l'utilisateur dans #{base_dn}..."
+  # Si un argument est passé, on recherche cet utilisateur, sinon on cherche l'utilisateur connecté
+  search_term = ARGV[0] || username
+  filter = Net::LDAP::Filter.eq('sAMAccountName', search_term)
+  
+  puts "Recherche des details de l'utilisateur '#{search_term}' dans #{base_dn}..."
   
   ldap.search(base: base_dn, filter: filter) do |entry|
     puts "Utilisateur trouve: #{entry.dn}"
