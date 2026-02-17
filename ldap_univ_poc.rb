@@ -17,7 +17,7 @@ ldap_config = {
   encryption: { method: :simple_tls },
   auth: {
     method: :simple,
-    username: "#{username}@univ-lorraine.fr",
+    username: "#{username}@etu.univ-lorraine.fr",
     password: password
   }
 }
