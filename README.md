@@ -92,3 +92,18 @@ ruby ldap_public_test.rb
 ```bash
 LDAP_USERNAME='votre_login' LDAP_PASSWORD='votre_mot_de_passe' ruby ldap_univ_poc.rb
 ```
+
+
+
+# PoC PHP - Connexion LDAP UL (LDAPS 636)
+
+## Prérequis
+- Linux
+- PHP + extension LDAP
+  - Debian/Ubuntu: `sudo apt install php php-ldap`
+
+## Lancer en local (simple)
+Dans ce dossier:
+```bash
+php -S 127.0.0.1:8080
+
