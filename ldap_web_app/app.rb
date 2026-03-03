@@ -27,6 +27,7 @@ helpers do
     Net::LDAP.new(
       host: LDAP_HOST,
       port: LDAP_PORT,
+      connect_timeout: 10,
       auth: { method: :simple, username: ADMIN_DN, password: ADMIN_PWD }
     )
   end
@@ -35,6 +36,7 @@ helpers do
     Net::LDAP.new(
       host: LDAP_HOST,
       port: LDAP_PORT,
+      connect_timeout: 10,
       auth: { method: :simple, username: "uid=#{uid},#{BASE_DN}", password: password }
     )
   end
@@ -104,6 +106,16 @@ helpers do
   def h(text)
     Rack::Utils.escape_html(text.to_s)
   end
+end
+
+# --- Gestion d'erreur globale ---
+
+error Net::LDAP::Error do
+  @error = "Impossible de joindre le serveur LDAP (#{LDAP_HOST}:#{LDAP_PORT}). " \
+           "Verifiez votre connexion reseau ou reessayez plus tard."
+  @users = []
+  @groups = []
+  erb :index
 end
 
 # --- Routes ---
