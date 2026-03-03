@@ -1,0 +1,61 @@
+<% @title = "Utilisateur : #{@uid}" %>
+
+<div class="breadcrumb">
+  <a href="/">Annuaire</a> &rsaquo; <span><%= h(@uid) %></span>
+</div>
+
+<% if @user %>
+  <div class="user-detail-card">
+    <div class="user-header">
+      <div class="user-avatar"><%= h(@uid[0..1].upcase) %></div>
+      <div>
+        <h1><%= h(@user[:attributes]['cn']&.first || @uid) %></h1>
+        <p class="user-dn"><%= h(@user[:dn]) %></p>
+      </div>
+    </div>
+
+    <div class="attributes-section">
+      <h2>Attributs LDAP</h2>
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Attribut</th>
+              <th>Valeur(s)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @user[:attributes].sort.each do |attr, values| %>
+              <tr>
+                <td><code><%= h(attr) %></code></td>
+                <td><%= h(values.join(', ')) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <% user_groups = @groups.select { |g| g[:members].include?(@uid) } %>
+    <% unless user_groups.empty? %>
+      <div class="attributes-section">
+        <h2>Appartenance aux groupes</h2>
+        <div class="groups-grid">
+          <% user_groups.each do |group| %>
+            <div class="card group-card">
+              <h3><%= h(group[:cn]) %></h3>
+              <p class="group-dn"><%= h(group[:dn]) %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="login-info" style="margin-top: 1.5rem;">
+      <p><strong>Pour s'authentifier en tant que cet utilisateur :</strong></p>
+      <code>Bind DN: uid=<%= h(@uid) %>,<%= BASE_DN %></code>
+    </div>
+  </div>
+<% else %>
+  <div class="alert alert-error">Utilisateur "<%= h(@uid) %>" introuvable dans l'annuaire.</div>
+<% end %>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LDAP Explorer - <%= @title || 'Annuaire' %></title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="nav-icon">📖</span>
+      <a href="/">LDAP Explorer</a>
+    </div>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Annuaire</a>
+      <a href="/search" class="nav-link">Recherche</a>
+      <% if logged_in? %>
+        <span class="nav-user">👤 <%= h(session[:user_cn] || current_user) %></span>
+        <a href="/logout" class="nav-link btn-logout">Déconnexion</a>
+      <% else %>
+        <a href="/login" class="nav-link btn-login">Connexion</a>
+      <% end %>
+    </div>
+  </nav>
+
+  <main class="container">
+    <% if @success %>
+      <div class="alert alert-success"><%= h(@success) %></div>
+    <% end %>
+    <% if @error %>
+      <div class="alert alert-error"><%= h(@error) %></div>
+    <% end %>
+
+    <%= yield %>
+  </main>
+
+  <footer class="footer">
+    <p>Projet SAÉ – LDAP Explorer &middot; Serveur : <code><%= LDAP_HOST %>:<%= LDAP_PORT %></code> &middot; Base DN : <code><%= BASE_DN %></code></p>
+  </footer>
+</body>
+</html>

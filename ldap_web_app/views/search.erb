@@ -1,0 +1,51 @@
+<% @title = 'Recherche LDAP' %>
+
+<div class="search-container">
+  <h1>🔍 Recherche dans l'annuaire</h1>
+  <p>Recherche par nom, email ou identifiant (uid)</p>
+
+  <form method="get" action="/search" class="search-form">
+    <div class="search-input-group">
+      <input type="text" name="q" placeholder="Rechercher un utilisateur..." 
+             value="<%= h(@query) %>" autofocus>
+      <button type="submit" class="btn btn-primary">Rechercher</button>
+    </div>
+  </form>
+
+  <div class="search-info">
+    <p><strong>Filtres LDAP utilisés :</strong></p>
+    <code>(|(cn=*{terme}*)(mail=*{terme}*)(uid={terme}))</code>
+  </div>
+</div>
+
+<% if @query && !@query.empty? %>
+  <section class="section">
+    <h2>Résultats pour "<%= h(@query) %>" (<%= @results.length %>)</h2>
+    <% if @results.empty? %>
+      <p class="no-results">Aucun résultat trouvé.</p>
+    <% else %>
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>UID</th>
+              <th>Email</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @results.each do |user| %>
+              <tr>
+                <td class="td-name"><%= h(user[:cn]) %></td>
+                <td><code><%= h(user[:uid]) %></code></td>
+                <td><%= h(user[:mail]) %></td>
+                <td><a href="/user/<%= h(user[:uid]) %>" class="btn btn-sm">Détails</a></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+  </section>
+<% end %>

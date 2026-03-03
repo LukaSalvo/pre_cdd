@@ -1,0 +1,42 @@
+<% @title = 'Connexion LDAP' %>
+
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <span class="login-icon">🔐</span>
+      <h1>Authentification LDAP</h1>
+      <p>Connectez-vous avec un compte du serveur de test</p>
+    </div>
+
+    <form method="post" action="/login" class="login-form">
+      <div class="form-group">
+        <label for="uid">Identifiant (uid)</label>
+        <input type="text" id="uid" name="uid" placeholder="ex: einstein, tesla, newton..." 
+               value="<%= h(params[:uid].to_s) %>" autofocus required>
+      </div>
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" name="password" placeholder="password" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Se connecter</button>
+    </form>
+
+    <div class="login-help">
+      <h3>Comptes disponibles</h3>
+      <p>Tous les mots de passe sont : <code>password</code></p>
+      <div class="test-accounts">
+        <span class="account-chip" onclick="document.getElementById('uid').value='einstein'">einstein</span>
+        <span class="account-chip" onclick="document.getElementById('uid').value='tesla'">tesla</span>
+        <span class="account-chip" onclick="document.getElementById('uid').value='newton'">newton</span>
+        <span class="account-chip" onclick="document.getElementById('uid').value='galileo'">galileo</span>
+        <span class="account-chip" onclick="document.getElementById('uid').value='euler'">euler</span>
+        <span class="account-chip" onclick="document.getElementById('uid').value='curie'">curie</span>
+      </div>
+    </div>
+
+    <div class="login-info">
+      <p><strong>Bind DN utilisé :</strong></p>
+      <code>uid={votre_uid},dc=example,dc=com</code>
+    </div>
+  </div>
+</div>

@@ -1,94 +1,274 @@
+# Projet SAÉ : Déploiement d'une application / LDAP
 
-# Projet LDAP : Rapport de Raccordement
+Ce projet a pour objectif de se familiariser avec le protocole LDAP (Lightweight Directory Access Protocol), de comprendre son fonctionnement et ses usages, puis de mettre en pratique ces connaissances dans un contexte réel (annuaire de l'Université de Lorraine).
 
-Ce projet a pour objectif de se familiariser avec le protocole LDAP, de comprendre son fonctionnement et de mettre en pratique ces connaissances via un raccordement à un serveur public puis au serveur de l'Université de Lorraine.
+---
 
-## 1. Découverte de LDAP et raccordement à un serveur de test
+## Table des matières
 
-### Objectif
-Comprendre le fonctionnement général du protocole LDAP et réaliser un raccordement depuis une application (ici un script Ruby simple).
+1. [Synthèse sur le protocole LDAP](#1-synthèse-sur-le-protocole-ldap)
+2. [Étape 1 : Raccordement au serveur de test public](#2-étape-1--raccordement-au-serveur-de-test-public)
+3. [Étape 2 : Raccordement au LDAP de l'Université de Lorraine](#3-étape-2--raccordement-au-ldap-de-luniversité-de-lorraine)
+4. [Instructions d'installation et d'utilisation](#4-instructions-dinstallation-et-dutilisation)
 
-### Travail préliminaire : comprendre LDAP
-Avant le raccordement, voici une synthèse des concepts clés du protocole :
+---
 
-- **Concepts Fondamentaux** :
-    - **Annuaire** : Base de données spécialisée optimisée pour la lecture.
-    - **Entrée** : Objet stocké dans l'annuaire, identifié par un DN.
-    - **DN (Distinguished Name)** : Identifiant unique d'une entrée (ex: `cn=admin,dc=example,dc=com`).
-    - **Base DN** : Racine de la recherche dans l'arborescence.
-    - **Attributs** : Paires clé-valeur décrivant une entrée (ex: `mail`, `cn`).
+## 1. Synthèse sur le protocole LDAP
 
-- **Structure Arborescente (DIT)** : 
-    - L'annuaire est organisé hiérarchiquement (Directory Information Tree), similaire à un système de fichiers, reflétant souvent la structure organisationnelle (`dc`=domain component, `ou`=organizational unit).
+### 1.1. Concepts fondamentaux
 
-- **Opérations Courantes** :
-    - **Bind** : Authentification auprès du serveur.
-    - **Search** : Recherche d'entrées selon des filtres.
-    - **Compare** : Vérification de la valeur d'un attribut.
-    - **Add/Modify/Delete** : Opérations d'écriture (ajout, modification, suppression).
+| Concept | Description |
+|---------|-------------|
+| **Annuaire** | Base de données spécialisée, optimisée pour la lecture. Contrairement à une BDD relationnelle, il est conçu pour des consultations fréquentes et des écritures rares. |
+| **Entrée** | Objet stocké dans l'annuaire, représentant une entité (personne, groupe, machine, etc.). |
+| **Attribut** | Paire clé-valeur décrivant une entrée (ex : `mail`, `cn`, `sAMAccountName`). Chaque attribut a un type et peut être mono- ou multi-valué. |
+| **DN (Distinguished Name)** | Identifiant unique d'une entrée dans l'arborescence. Ex : `cn=admin,dc=example,dc=com`. |
+| **Base DN** | Point de départ (racine) d'une recherche dans l'arborescence. |
+| **Bind** | Opération d'authentification auprès du serveur LDAP. |
 
-- **Sécurité (LDAP vs LDAPS)** :
-    - **LDAP (port 389)** : Protocole standard, échanges en clair (non sécurisé).
-    - **LDAPS (port 636)** : LDAP sur SSL/TLS, échanges chiffrés (obligatoire pour l'authentification sécurisée).
+### 1.2. Structure arborescente (DIT – Directory Information Tree)
 
-- **Cas d'usage en entreprise** :
-    - Authentification centralisée (SSO).
-    - Annuaire d'entreprise (carnet d'adresses partagé).
-    - Gestion fine des droits et des accès applications.
+L'annuaire LDAP est organisé de manière hiérarchique, similaire à un système de fichiers. Cette structure reflète souvent l'organisation de l'entité :
 
-### Raccordement au Serveur de Test Public
-Pour cette première étape, nous avons utilisé le serveur `ldap.forumsys.com`.
+```
+dc=example,dc=com                    (domaine racine)
+├── ou=People                        (unité organisationnelle)
+│   ├── uid=einstein                 (utilisateur)
+│   ├── uid=tesla                    (utilisateur)
+│   └── uid=newton                   (utilisateur)
+├── ou=Groups                        (unité organisationnelle)
+│   ├── cn=Scientists                (groupe)
+│   └── cn=Italians                  (groupe)
+└── cn=read-only-admin               (compte admin)
+```
 
-#### Configuration
-- **Serveur** : `ldap.forumsys.com`
-- **Port** : `389`
-- **Bind DN** : `cn=read-only-admin,dc=example,dc=com`
-- **Mot de passe** : `password`
+Les composants principaux du DN :
+- **`dc`** (Domain Component) : composant de domaine (`dc=example,dc=com`)
+- **`ou`** (Organizational Unit) : unité organisationnelle
+- **`cn`** (Common Name) : nom commun
+- **`uid`** (User ID) : identifiant utilisateur
 
-#### Gems Utilisées
-- `net-ldap` : La gem standard Ruby pour interagir avec les serveurs LDAP. Elle permet de gérer facilement les connexions, les binds et les recherches.
+### 1.3. Opérations courantes
 
-## 3. Raccordement au LDAP de l'Université de Lorraine
+| Opération | Description |
+|-----------|-------------|
+| **Bind** | Authentification auprès du serveur (anonyme ou avec identifiants). |
+| **Search** | Recherche d'entrées selon une base DN, un scope et un filtre. |
+| **Compare** | Vérifie si un attribut d'une entrée contient une valeur spécifique. |
+| **Add** | Ajoute une nouvelle entrée dans l'annuaire. |
+| **Modify** | Modifie les attributs d'une entrée existante. |
+| **Delete** | Supprime une entrée de l'annuaire. |
 
-Cette étape impliquait une connexion sécurisée à un environnement de production.
+### 1.4. LDAP vs LDAPS
 
-### Différences avec le Serveur de Test
-1.  **Sécurité (LDAPS vs LDAP)** :
-    -   Le serveur public utilise le port **389** (texte clair).
-    -   L'université utilise le port **636** avec **SSL/TLS** (LDAPS), ce qui est impératif pour la sécurité des identifiants.
-2.  **Authentification** : 
-    -   Utilisation des identifiants réels de l'université.
-    -   Format du login : `login@univ-lorraine.fr`.
-3.  **Structure (DN)** :
-    -   Le Base DN est beaucoup plus complexe : `OU=Personnels,OU=_Utilisateurs,OU=UL,DC=ad,DC=univ-lorraine,DC=fr`.
-4.  **Attributs Spécifiques** :
-    -   Utilisation de `memberOf` pour déterminer l'appartenance (IUT, Département Info) via des groupes spécifiques comme `GGA_STP_FHB--`.
+| Caractéristique | LDAP | LDAPS |
+|-----------------|------|-------|
+| **Port** | 389 | 636 |
+| **Chiffrement** | Aucun (texte clair) | SSL/TLS |
+| **Sécurité** | Les identifiants transitent en clair | Échanges entièrement chiffrés |
+| **Usage** | Tests, environnements internes isolés | **Obligatoire en production** |
 
-### Implémentation du Script `ldap_univ_poc.rb`
-Le script réalisé permet de :
-1.  Se connecter en toute sécurité (LDAPS).
-2.  S'authentifier avec les variables d'environnement `LDAP_USERNAME` et `LDAP_PASSWORD` (pour ne jamais stocker les mots de passe dans le code).
-3.  Rechercher l'utilisateur connecté et afficher ses informations (Nom, Email, Groupes).
+> ⚠️ **Important** : L'utilisation de LDAPS est impérative dès qu'il y a transmission d'identifiants réels. Un bind LDAP sur le port 389 expose le mot de passe en clair sur le réseau.
 
-## Instructions d'Utilisation
+### 1.5. Cas d'usage en entreprise
 
-### Prérequis
-- Ruby installé
-- `bundler` installé
+- **Authentification centralisée (SSO)** : un seul identifiant pour accéder à toutes les applications de l'entreprise (ex : Active Directory de Microsoft).
+- **Annuaire d'entreprise** : carnet d'adresses partagé avec coordonnées, photos, rattachement hiérarchique.
+- **Gestion des droits et accès** : contrôle d'accès basé sur l'appartenance à des groupes LDAP (`memberOf`).
+- **Service de messagerie** : résolution d'adresses mail via l'annuaire.
+- **Provisioning automatisé** : création automatique de comptes dans les applications connectées.
 
-### Installation
+---
+
+## 2. Étape 1 : Raccordement au serveur de test public
+
+### 2.1. Serveur utilisé
+
+| Paramètre | Valeur |
+|-----------|--------|
+| **Serveur** | `ldap.forumsys.com` |
+| **Port** | `389` (LDAP non sécurisé) |
+| **Bind DN (admin)** | `cn=read-only-admin,dc=example,dc=com` |
+| **Mot de passe** | `password` |
+| **Utilisateurs de test** | `uid=einstein`, `uid=tesla`, `uid=newton`, etc. (mot de passe : `password`) |
+
+### 2.2. Tests en ligne de commande (ldapsearch)
+
+Avant de développer le script Ruby, nous avons validé la connectivité avec `ldapsearch` :
+
+**Test de connectivité et exploration de la structure :**
 ```bash
+# Recherche de toutes les entrées sous le domaine racine
+ldapsearch -x -H ldap://ldap.forumsys.com -b "dc=example,dc=com" -D "cn=read-only-admin,dc=example,dc=com" -w password
+
+# Recherche des utilisateurs uniquement
+ldapsearch -x -H ldap://ldap.forumsys.com -b "dc=example,dc=com" -D "cn=read-only-admin,dc=example,dc=com" -w password "(objectClass=person)"
+
+# Recherche d'un utilisateur spécifique (Einstein)
+ldapsearch -x -H ldap://ldap.forumsys.com -b "dc=example,dc=com" -D "cn=read-only-admin,dc=example,dc=com" -w password "(uid=einstein)"
+
+# Bind avec un utilisateur standard
+ldapsearch -x -H ldap://ldap.forumsys.com -b "dc=example,dc=com" -D "uid=tesla,dc=example,dc=com" -w password "(uid=tesla)"
+```
+
+**Explication des paramètres :**
+- `-x` : authentification simple (pas SASL)
+- `-H` : URL du serveur LDAP
+- `-b` : Base DN (point de départ de la recherche)
+- `-D` : DN du compte utilisé pour le bind
+- `-w` : mot de passe
+
+### 2.3. Script Ruby (`ldap_public_test.rb`)
+
+Le script de test effectue les opérations suivantes :
+1. **Bind admin** : connexion avec le compte `read-only-admin`
+2. **Exploration du DIT** : listing des unités organisationnelles et des groupes
+3. **Liste des utilisateurs** : recherche et affichage de tous les utilisateurs avec leurs attributs
+4. **Bind multi-utilisateurs** : authentification avec différents comptes (`einstein`, `tesla`, `newton`, etc.)
+5. **Filtres de recherche** : démonstration des filtres LDAP (par attribut, combinés AND, OR)
+
+### 2.4. Gem utilisée
+
+- **`net-ldap`** : gem standard Ruby pour interagir avec les serveurs LDAP. Elle fournit :
+  - Gestion des connexions (LDAP et LDAPS)
+  - Opérations de bind, search, add, modify, delete
+  - Construction de filtres de recherche (`Net::LDAP::Filter`)
+  - Support SSL/TLS pour les connexions sécurisées
+
+---
+
+## 3. Étape 2 : Raccordement au LDAP de l'Université de Lorraine
+
+### 3.1. Informations de connexion
+
+| Paramètre | Valeur |
+|-----------|--------|
+| **Serveurs** | `ldaps://montet-dc1.ad.univ-lorraine.fr:636` / `ldaps://montet-dc2.ad.univ-lorraine.fr:636` |
+| **Port** | `636` (LDAPS) |
+| **Authentification** | `login@univ-lorraine.fr` |
+| **Base DN (personnels)** | `OU=Personnels,OU=_Utilisateurs,OU=UL,DC=ad,DC=univ-lorraine,DC=fr` |
+| **Base DN (utilisateurs)** | `OU=_Utilisateurs,OU=UL,DC=ad,DC=univ-lorraine,DC=fr` |
+
+### 3.2. Tests en ligne de commande (ldapsearch)
+
+```bash
+# Recherche sur le serveur LDAPS de l'UL
+ldapsearch -x -H ldaps://montet-dc1.ad.univ-lorraine.fr:636 \
+  -b "OU=_Utilisateurs,OU=UL,DC=ad,DC=univ-lorraine,DC=fr" \
+  -D "votre_login@univ-lorraine.fr" \
+  -W \
+  "(sAMAccountName=votre_login)"
+
+# Le flag -W demande le mot de passe interactivement (plus sécurisé)
+```
+
+### 3.3. Différences avec le serveur de test public
+
+| Aspect | Serveur public (test) | Serveur UL (production) |
+|--------|----------------------|------------------------|
+| **Protocole** | LDAP (port 389, texte clair) | LDAPS (port 636, SSL/TLS) |
+| **Authentification** | DN complet (`cn=...`) | Format email (`login@univ-lorraine.fr`) |
+| **Certificat** | Non applicable | Certificat SSL de l'UL (auto-signé, nécessite `VERIFY_NONE` ou ajout au truststore) |
+| **Structure DN** | Simple (`dc=example,dc=com`) | Complexe (`OU=Personnels,OU=_Utilisateurs,...`) |
+| **Type d'annuaire** | OpenLDAP standard | Active Directory (Microsoft) |
+| **Attributs clés** | `uid`, `cn`, `mail` | `sAMAccountName`, `cn`, `mail`, `memberOf` |
+| **Groupes** | `groupOfUniqueNames` / `uniqueMember` | Groupes AD / `memberOf` |
+| **Scope** | Annuaire plat | Arborescence hiérarchique multi-OU |
+| **Mot de passe** | Hardcodé (`password`) | Identifiants réels → **jamais dans le code** |
+
+### 3.4. Script PoC (`ldap_univ_poc.rb`)
+
+Le script de proof of concept permet :
+1. **Connexion sécurisée (LDAPS)** au serveur de l'UL avec failover automatique entre les 2 serveurs
+2. **Authentification** via les variables d'environnement (`LDAP_USERNAME`, `LDAP_PASSWORD`)
+3. **Recherche d'utilisateur** par login (`sAMAccountName`) ou par nom (`cn`)
+4. **Affichage des informations** : nom, login, email, téléphone
+5. **Rattachement structurel** : détection automatique de l'IUTNC et du Département Informatique via les groupes `memberOf`
+
+### 3.5. Précaution concernant le mot de passe
+
+Le mot de passe **ne doit jamais apparaître en clair dans le code source**. Deux méthodes sont proposées :
+
+1. **Fichier `.env`** (recommandé) : créer un fichier `.env` à partir de `.env.example`
+2. **Variables d'environnement inline** : passer les variables directement dans la commande
+
+Le fichier `.env` est ajouté au `.gitignore` pour ne jamais être versionné.
+
+---
+
+## 4. Instructions d'installation et d'utilisation
+
+### 4.1. Prérequis
+
+- **Système** : Linux (obligatoire)
+- **Ruby** : version disponible sur la machine de développement
+- **Bundler** : `gem install bundler` si non installé
+- **ldapsearch** : `sudo apt install ldap-utils` (pour les tests CLI)
+
+### 4.2. Installation
+
+```bash
+# Cloner le dépôt
+git clone <url_du_depot>
+cd pre_cdd
+
+# Installer les dépendances Ruby
 bundle install
 ```
 
-### Exécution du Test Public
+### 4.3. Exécution du test public (Étape 1)
+
 ```bash
 ruby ldap_public_test.rb
 ```
 
-### Exécution du PoC Université
-**Attention** : Nécessite vos identifiants UL.
+Ce script ne nécessite aucune configuration, il se connecte directement au serveur public de test.
 
+### 4.4. Exécution du PoC Université (Étape 2)
+
+**Méthode 1 : Fichier `.env` (recommandé)**
 ```bash
-LDAP_USERNAME='votre_login' LDAP_PASSWORD='votre_mot_de_passe' ruby ldap_univ_poc.rb
+# Copier le fichier d'exemple
+cp .env.example .env
+
+# Editer avec vos identifiants UL
+nano .env
+
+# Exécuter le script
+ruby ldap_univ_poc.rb
 ```
+
+**Méthode 2 : Variables inline**
+```bash
+LDAP_USERNAME='votre_login' LDAP_PASSWORD='votre_mdp' ruby ldap_univ_poc.rb
+```
+
+**Options :**
+```bash
+# Rechercher un autre utilisateur
+ruby ldap_univ_poc.rb nom_utilisateur
+
+# Mode verbose (affiche tous les groupes)
+ruby ldap_univ_poc.rb -v
+```
+
+### 4.5. Structure du projet
+
+```
+pre_cdd/
+├── .env.example          # Template des variables d'environnement
+├── .gitignore            # Fichiers à ne pas versionner (.env, etc.)
+├── Gemfile               # Dépendances Ruby
+├── Gemfile.lock          # Versions verrouillées des gems
+├── README.md             # Ce fichier (documentation complète)
+├── ldap_public_test.rb   # Script de test avec le serveur public
+├── ldap_univ_poc.rb      # PoC LDAP Université de Lorraine
+└── pre_ccd.pdf           # Sujet du projet
+```
+
+### 4.6. Gems utilisées
+
+| Gem | Version | Description |
+|-----|---------|-------------|
+| `net-ldap` | ~> 0.19 | Gem standard Ruby pour les interactions LDAP/LDAPS |
+| `dotenv` | ~> 3.1 | Chargement automatique des variables d'environnement depuis un fichier `.env` |

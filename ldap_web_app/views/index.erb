@@ -1,0 +1,72 @@
+<% @title = 'Annuaire LDAP' %>
+
+<div class="hero">
+  <h1>📖 Annuaire LDAP</h1>
+  <p class="hero-sub">Exploration du serveur public <code>ldap.forumsys.com</code></p>
+</div>
+
+<div class="info-bar">
+  <div class="info-item">
+    <span class="info-label">Serveur</span>
+    <span class="info-value"><%= LDAP_HOST %></span>
+  </div>
+  <div class="info-item">
+    <span class="info-label">Port</span>
+    <span class="info-value"><%= LDAP_PORT %> (LDAP)</span>
+  </div>
+  <div class="info-item">
+    <span class="info-label">Base DN</span>
+    <span class="info-value"><%= BASE_DN %></span>
+  </div>
+  <div class="info-item">
+    <span class="info-label">Utilisateurs</span>
+    <span class="info-value"><%= @users.length %></span>
+  </div>
+</div>
+
+<!-- Groupes -->
+<section class="section">
+  <h2>👥 Groupes (<%= @groups.length %>)</h2>
+  <div class="groups-grid">
+    <% @groups.each do |group| %>
+      <div class="card group-card">
+        <h3><%= h(group[:cn]) %></h3>
+        <p class="group-dn"><%= h(group[:dn]) %></p>
+        <ul class="member-list">
+          <% group[:members].each do |member| %>
+            <li><a href="/user/<%= h(member) %>"><%= h(member) %></a></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+  </div>
+</section>
+
+<!-- Utilisateurs -->
+<section class="section">
+  <h2>👤 Utilisateurs (<%= @users.length %>)</h2>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>UID</th>
+          <th>Email</th>
+          <th>Téléphone</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @users.each do |user| %>
+          <tr>
+            <td class="td-name"><%= h(user[:cn]) %></td>
+            <td><code><%= h(user[:uid]) %></code></td>
+            <td><%= h(user[:mail]) %></td>
+            <td><%= user[:phone] ? h(user[:phone]) : '—' %></td>
+            <td><a href="/user/<%= h(user[:uid]) %>" class="btn btn-sm">Détails</a></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>
