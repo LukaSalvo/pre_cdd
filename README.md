@@ -245,30 +245,20 @@ LDAP_USERNAME='votre_login' LDAP_PASSWORD='votre_mdp' ruby ldap_univ_poc.rb
 
 **Options :**
 ```bash
-# Rechercher un autre utilisateur
-ruby ldap_univ_poc.rb nom_utilisateur
-
-# Mode verbose (affiche tous les groupes)
-ruby ldap_univ_poc.rb -v
+LDAP_USERNAME='votre_login' LDAP_PASSWORD='votre_mot_de_passe' ruby ldap_univ_poc.rb
 ```
 
-### 4.5. Structure du projet
 
-```
-pre_cdd/
-├── .env.example          # Template des variables d'environnement
-├── .gitignore            # Fichiers à ne pas versionner (.env, etc.)
-├── Gemfile               # Dépendances Ruby
-├── Gemfile.lock          # Versions verrouillées des gems
-├── README.md             # Ce fichier (documentation complète)
-├── ldap_public_test.rb   # Script de test avec le serveur public
-├── ldap_univ_poc.rb      # PoC LDAP Université de Lorraine
-└── pre_ccd.pdf           # Sujet du projet
-```
 
-### 4.6. Gems utilisées
+# PoC PHP - Connexion LDAP UL (LDAPS 636)
 
-| Gem | Version | Description |
-|-----|---------|-------------|
-| `net-ldap` | ~> 0.19 | Gem standard Ruby pour les interactions LDAP/LDAPS |
-| `dotenv` | ~> 3.1 | Chargement automatique des variables d'environnement depuis un fichier `.env` |
+## Prérequis
+- Linux
+- PHP + extension LDAP
+  - Debian/Ubuntu: `sudo apt install php php-ldap`
+
+## Lancer en local (simple)
+Dans ce dossier:
+```bash
+php -S 127.0.0.1:8080
+
