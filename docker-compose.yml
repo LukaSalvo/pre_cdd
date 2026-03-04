@@ -8,7 +8,7 @@ services:
       - PUID=1000
       - PGID=1000
       - APP_URL=${APP_URL:-http://localhost:6875}
-      - APP_KEY=base64:RE0f5njYoyVGvXTh5MXGIcVAABJMzuKDQzS0CqqqN4A=
+      - APP_KEY=${APP_KEY}
       - DB_HOST=bookstack_db
       - DB_USER=${DB_USER:-bookstack}
       - DB_USERNAME=${DB_USER:-bookstack}
@@ -17,6 +17,18 @@ services:
       - DB_DATABASE=${DB_DATABASE:-bookstackapp}
       # LDAP Authentication Configuration
       - AUTH_METHOD=standard
+
+      # Configuration LDAP
+      - LDAP_DN=${LDAP_DN}
+      - LDAP_PASS=${LDAP_PASS}
+      - LDAP_VERSION=3
+      - LDAP_TLS_CA_CERT=/config/ul-ca.crt
+      - LDAP_TLS_INSECURE=true
+      - LDAP_USER_FILTER=(&(objectClass=user)(sAMAccountName=$${user}))
+      - LDAP_ID_ATTRIBUTE=sAMAccountName
+      - LDAP_EMAIL_ATTRIBUTE=mail
+      - LDAP_DISPLAY_NAME_ATTRIBUTE=displayName
+
       # Options de certificat : Option B par defaut (INSECURE) pour dev
       - LDAP_TLS_INSECURE=${LDAP_TLS_INSECURE:-true}
       # Si Option A: de-commenter la ligne cd-dessous et commenter la ligne au dessus
