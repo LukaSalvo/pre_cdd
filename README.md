@@ -248,17 +248,54 @@ LDAP_USERNAME='votre_login' LDAP_PASSWORD='votre_mdp' ruby ldap_univ_poc.rb
 LDAP_USERNAME='votre_login' LDAP_PASSWORD='votre_mot_de_passe' ruby ldap_univ_poc.rb
 ```
 
+## 5. Étape 3 : Déploiement d'une application existante (BookStack)
 
+L'objectif est de déployer BookStack via Docker et de déléguer l'authentification au LDAP de l'Université de Lorraine.
 
-# PoC PHP - Connexion LDAP UL (LDAPS 636)
+### 5.1. Prérequis
 
-## Prérequis
-- Linux
-- PHP + extension LDAP
-  - Debian/Ubuntu: `sudo apt install php php-ldap`
+- **Docker** et **Docker Compose** installés sur la machine.
+- Accès au réseau de l'Université de Lorraine (pour joindre `montet-dc1.ad.univ-lorraine.fr:636`).
 
-## Lancer en local (simple)
-Dans ce dossier:
+### 5.2. Configuration
+
+Toute la configuration LDAP est passée via les variables d'environnement définies dans le fichier `docker-compose.yml` et le fichier `.env`.
+
+1. **Créer le fichier `.env`** :
+   ```bash
+   cp .env.example .env
+   ```
+2. **Modifier `.env`** avec vos identifiants UL. Remarquez que pour l'Active Directory, `LDAP_DN` doit être sous la forme UPN (`login@univ-lorraine.fr`) :
+   ```env
+   LDAP_DN=votre_login@univ-lorraine.fr
+   LDAP_PASS=votre_mot_de_passe_ul
+   ```
+
+### 5.3. Lancement de l'application
+
+Lancez la pile Docker :
 ```bash
-php -S 127.0.0.1:8080
+docker-compose up -d
+```
 
+L'application sera disponible sur **[http://localhost:6875](http://localhost:6875)**.
+
+### 5.4. Certificats TLS (Options A et B)
+
+Par défaut, l'application est configurée avec **Option B** (pour le développement) : `LDAP_TLS_INSECURE=true`, ce qui ignore la validation du certificat auto-signé de l'UL.
+
+Si vous souhaitez utiliser l' **Option A** (recommandée / production), vous devez :
+1. Récupérer le certificat racine de l'UL :
+   ```bash
+   openssl s_client -connect montet-dc1.ad.univ-lorraine.fr:636 -showcerts </dev/null 2>/dev/null
+   ```
+   Copiez le dernier bloc `-----BEGIN CERTIFICATE-----` ... `-----END CERTIFICATE-----` dans un fichier nommé `ul-ca.crt` à la racine du projet.
+2. Dans `docker-compose.yml`, décommentez la ligne de montage du volume et la variable `LDAP_TLS_CA_CERT`, puis commentez `LDAP_TLS_INSECURE=true`.
+
+### 5.5. Test de connexion LDAP
+
+Une fois BookStack lancé, connectez-vous avec :
+- **Login** : Votre adresse mail (ou identifiant) en fonction de la configuration LDAP. Dans cette configuration, `LDAP_USER_FILTER` est paramétré sur `(&(objectClass=user)(sAMAccountName=${input}))` ce qui signifie que vous devez saisir **votre login court UL** (la partie avant le `@`).
+- **Mot de passe** : Votre mot de passe UL.
+
+Le profil se créera automatiquement en reprenant votre "displayName" (nom affiché) et votre "mail" configuré dans l'Active Directory.

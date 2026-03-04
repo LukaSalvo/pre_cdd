@@ -10,17 +10,11 @@ GEM
 
 PLATFORMS
   ruby
-  x86_64-linux-gnu
+  x86_64-linux
 
 DEPENDENCIES
   dotenv
   net-ldap
 
-CHECKSUMS
-  base64 (0.3.0) sha256=27337aeabad6ffae05c265c450490628ef3ebd4b67be58257393227588f5a97b
-  dotenv (3.2.0) sha256=e375b83121ea7ca4ce20f214740076129ab8514cd81378161f11c03853fe619d
-  net-ldap (0.20.0) sha256=b2080b350753a9ac4930869ded8e61a1d2151c01e03b0bf07b4675cbd9ce5372
-  ostruct (0.6.3) sha256=95a2ed4a4bd1d190784e666b47b2d3f078e4a9efda2fccf18f84ddc6538ed912
-
 BUNDLED WITH
-  4.0.6
+   2.6.9
