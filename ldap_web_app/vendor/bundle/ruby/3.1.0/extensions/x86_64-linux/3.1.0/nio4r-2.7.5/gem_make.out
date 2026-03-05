@@ -1,5 +1,5 @@
-current directory: /home/salvo4u/Documents/SAE/pre_cdd/ldap_web_app/vendor/bundle/ruby/3.1.0/gems/nio4r-2.7.5/ext/nio4r
-/usr/bin/ruby3.1 -I /usr/lib/ruby/vendor_ruby -r ./siteconf20260304-340486-6uzwvw.rb extconf.rb
+current directory: /home/aminobela/pre_cdd/ldap_web_app/vendor/bundle/ruby/3.1.0/gems/nio4r-2.7.5/ext/nio4r
+/usr/bin/ruby3.1 -I /usr/lib/ruby/vendor_ruby -r ./siteconf20260305-1614997-mtipks.rb extconf.rb
 checking for unistd.h... yes
 checking for rb_io_descriptor()... yes
 checking for linux/aio_abi.h... yes
@@ -12,10 +12,10 @@ checking for port_event_t in port.h... no
 checking for sys/resource.h... yes
 creating Makefile
 
-current directory: /home/salvo4u/Documents/SAE/pre_cdd/ldap_web_app/vendor/bundle/ruby/3.1.0/gems/nio4r-2.7.5/ext/nio4r
+current directory: /home/aminobela/pre_cdd/ldap_web_app/vendor/bundle/ruby/3.1.0/gems/nio4r-2.7.5/ext/nio4r
 make DESTDIR\= clean
 
-current directory: /home/salvo4u/Documents/SAE/pre_cdd/ldap_web_app/vendor/bundle/ruby/3.1.0/gems/nio4r-2.7.5/ext/nio4r
+current directory: /home/aminobela/pre_cdd/ldap_web_app/vendor/bundle/ruby/3.1.0/gems/nio4r-2.7.5/ext/nio4r
 make DESTDIR\=
 compiling bytebuffer.c
 compiling monitor.c
@@ -45,6 +45,6 @@ selector.c:525:5: warning: ignoring return value of ‘write’ declared with at
       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 linking shared-object nio4r_ext.so
 
-current directory: /home/salvo4u/Documents/SAE/pre_cdd/ldap_web_app/vendor/bundle/ruby/3.1.0/gems/nio4r-2.7.5/ext/nio4r
+current directory: /home/aminobela/pre_cdd/ldap_web_app/vendor/bundle/ruby/3.1.0/gems/nio4r-2.7.5/ext/nio4r
 make DESTDIR\= install
-/usr/bin/install -c -m 0755 nio4r_ext.so ./.gem.20260304-340486-6o6cfn
+/usr/bin/install -c -m 0755 nio4r_ext.so ./.gem.20260305-1614997-8sbfz3

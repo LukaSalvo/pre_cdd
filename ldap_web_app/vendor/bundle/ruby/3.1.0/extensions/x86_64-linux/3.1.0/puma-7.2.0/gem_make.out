@@ -1,6 +1,8 @@
-current directory: /home/salvo4u/Documents/SAE/pre_cdd/ldap_web_app/vendor/bundle/ruby/3.1.0/gems/puma-7.2.0/ext/puma_http11
-/usr/bin/ruby3.1 -I /usr/lib/ruby/vendor_ruby -r ./siteconf20260304-340486-aphs49.rb extconf.rb
-──── Using OpenSSL pkgconfig (openssl.pc) ────
+current directory: /home/aminobela/pre_cdd/ldap_web_app/vendor/bundle/ruby/3.1.0/gems/puma-7.2.0/ext/puma_http11
+/usr/bin/ruby3.1 -I /usr/lib/ruby/vendor_ruby -r ./siteconf20260305-1614997-ml4r2v.rb extconf.rb
+checking for BIO_read() in -llibcrypto... no
+checking for BIO_read() in -lcrypto... yes
+checking for SSL_CTX_new() in -lssl... yes
 checking for openssl/bio.h... yes
 
 ──── Below are yes for 1.0.2 & later ────
@@ -22,16 +24,16 @@ checking for SSL_get1_peer_certificate() in openssl/ssl.h... yes
 
 creating Makefile
 
-current directory: /home/salvo4u/Documents/SAE/pre_cdd/ldap_web_app/vendor/bundle/ruby/3.1.0/gems/puma-7.2.0/ext/puma_http11
+current directory: /home/aminobela/pre_cdd/ldap_web_app/vendor/bundle/ruby/3.1.0/gems/puma-7.2.0/ext/puma_http11
 make DESTDIR\= clean
 
-current directory: /home/salvo4u/Documents/SAE/pre_cdd/ldap_web_app/vendor/bundle/ruby/3.1.0/gems/puma-7.2.0/ext/puma_http11
+current directory: /home/aminobela/pre_cdd/ldap_web_app/vendor/bundle/ruby/3.1.0/gems/puma-7.2.0/ext/puma_http11
 make DESTDIR\=
 compiling http11_parser.c
 compiling mini_ssl.c
 compiling puma_http11.c
 linking shared-object puma/puma_http11.so
 
-current directory: /home/salvo4u/Documents/SAE/pre_cdd/ldap_web_app/vendor/bundle/ruby/3.1.0/gems/puma-7.2.0/ext/puma_http11
+current directory: /home/aminobela/pre_cdd/ldap_web_app/vendor/bundle/ruby/3.1.0/gems/puma-7.2.0/ext/puma_http11
 make DESTDIR\= install
-/usr/bin/install -c -m 0755 puma_http11.so ./.gem.20260304-340486-usk2f0/puma
+/usr/bin/install -c -m 0755 puma_http11.so ./.gem.20260305-1614997-nfcyj5/puma

@@ -32,8 +32,8 @@ rubyhdrdir = $(includedir)/$(RUBY_VERSION_NAME)
 vendorarchdir = $(rubysitearchprefix)/vendor_ruby/$(ruby_version)
 vendorlibdir = $(vendordir)/$(ruby_version)
 vendordir = $(rubylibprefix)/vendor_ruby
-sitearchdir = $(DESTDIR)./.gem.20260304-340486-usk2f0
-sitelibdir = $(DESTDIR)./.gem.20260304-340486-usk2f0
+sitearchdir = $(DESTDIR)./.gem.20260305-1614997-nfcyj5
+sitelibdir = $(DESTDIR)./.gem.20260305-1614997-nfcyj5
 sitedir = $(DESTDIR)/usr/local/lib/site_ruby
 rubyarchdir = $(rubyarchprefix)/$(ruby_version)
 rubylibdir = $(rubylibprefix)/$(ruby_version)
@@ -85,12 +85,12 @@ debugflags = -ggdb3
 warnflags = -Wall -Wextra -Wdeprecated-declarations -Wduplicated-cond -Wimplicit-function-declaration -Wimplicit-int -Wmisleading-indentation -Wpointer-arith -Wwrite-strings -Wold-style-definition -Wimplicit-fallthrough=0 -Wmissing-noreturn -Wno-cast-function-type -Wno-constant-logical-operand -Wno-long-long -Wno-missing-field-initializers -Wno-overlength-strings -Wno-packed-bitfield-compat -Wno-parentheses-equality -Wno-self-assign -Wno-tautological-compare -Wno-unused-parameter -Wno-unused-value -Wsuggest-attribute=format -Wsuggest-attribute=noreturn -Wunused-variable -Wundef
 cppflags = 
 CCDLFLAGS = -fPIC
-CFLAGS   = $(CCDLFLAGS) -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC  $(ARCH_FLAG)
-INCFLAGS = -I. -I$(arch_hdrdir) -I$(hdrdir)/ruby/backward -I$(hdrdir) -I$(srcdir) 
+CFLAGS   = $(CCDLFLAGS) -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC $(ARCH_FLAG)
+INCFLAGS = -I. -I$(arch_hdrdir) -I$(hdrdir)/ruby/backward -I$(hdrdir) -I$(srcdir)
 DEFS     = 
 CPPFLAGS = -DHAVE_OPENSSL_BIO_H -DHAVE_DTLS_METHOD -DHAVE_SSL_CTX_SET_SESSION_CACHE_MODE -DHAVE_TLS_SERVER_METHOD -DHAVE_SSL_CTX_SET_MIN_PROTO_VERSION -DHAVE_SSL_CTX_SET_DH_AUTO -DHAVE_SSL_CTX_SET_CIPHERSUITES -DHAVE_SSL_GET1_PEER_CERTIFICATE -Wdate-time -D_FORTIFY_SOURCE=2 $(DEFS) $(cppflags)
-CXXFLAGS = $(CCDLFLAGS) -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security  $(ARCH_FLAG)
-ldflags  = -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed 
+CXXFLAGS = $(CCDLFLAGS) -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security $(ARCH_FLAG)
+ldflags  = -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed
 dldflags = -Wl,-z,relro -Wl,-z,now 
 ARCH_FLAG = 
 DLDFLAGS = $(ldflags) $(dldflags) $(ARCH_FLAG)
@@ -138,7 +138,7 @@ extout =
 extout_prefix = 
 target_prefix = /puma
 LOCAL_LIBS = 
-LIBS = $(LIBRUBYARG_SHARED)  -lssl -lcrypto -lm  -lc
+LIBS = $(LIBRUBYARG_SHARED) -lssl -lcrypto  -lm  -lc
 ORIG_SRCS = http11_parser.c mini_ssl.c puma_http11.c
 SRCS = $(ORIG_SRCS) 
 OBJS = http11_parser.o mini_ssl.o puma_http11.o

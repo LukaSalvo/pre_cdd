@@ -1,17 +1,22 @@
 #!/usr/bin/env ruby
-# Application web Sinatra de raccordement au serveur LDAP public de test
-# Étape 1 du projet : Découverte de LDAP via une interface web
+# Application web Sinatra de raccordement au LDAP de l'Université de Lorraine
+# Étape 2 du projet : Connexion sécurisée LDAPS via une interface web
 
 require 'sinatra'
 require 'net/ldap'
+require 'dotenv'
+Dotenv.load(File.join(__dir__, '..', '.env'))
 
 # --- Configuration ---
 
-LDAP_HOST = 'ldap.forumsys.com'
-LDAP_PORT = 389
-BASE_DN   = 'dc=example,dc=com'
-ADMIN_DN  = "cn=read-only-admin,#{BASE_DN}"
-ADMIN_PWD = 'password'
+LDAP_HOST = 'montet-dc1.ad.univ-lorraine.fr'
+LDAP_PORT = 636
+BASE_DN   = 'OU=_Utilisateurs,OU=UL,DC=ad,DC=univ-lorraine,DC=fr'
+ADMIN_USER = ENV['LDAP_USERNAME'] || ENV['LDAP_DN']
+ADMIN_PWD  = ENV['LDAP_PASSWORD'] || ENV['LDAP_PASS']
+
+# Build full UPN — avoid double-appending the domain suffix
+ADMIN_UPN = ADMIN_USER&.include?('@') ? ADMIN_USER : "#{ADMIN_USER}@etu.univ-lorraine.fr"
 
 set :port, 4567
 set :bind, '0.0.0.0'
@@ -28,7 +33,15 @@ helpers do
       host: LDAP_HOST,
       port: LDAP_PORT,
       connect_timeout: 10,
-      auth: { method: :simple, username: ADMIN_DN, password: ADMIN_PWD }
+      encryption: {
+        method: :simple_tls,
+        tls_options: { verify_mode: OpenSSL::SSL::VERIFY_NONE }
+      },
+      auth: {
+        method: :simple,
+        username: ADMIN_UPN,
+        password: ADMIN_PWD
+      }
     )
   end
 
@@ -37,7 +50,15 @@ helpers do
       host: LDAP_HOST,
       port: LDAP_PORT,
       connect_timeout: 10,
-      auth: { method: :simple, username: "uid=#{uid},#{BASE_DN}", password: password }
+      encryption: {
+        method: :simple_tls,
+        tls_options: { verify_mode: OpenSSL::SSL::VERIFY_NONE }
+      },
+      auth: {
+        method: :simple,
+        username: "#{uid}@etu.univ-lorraine.fr",
+        password: password
+      }
     )
   end
 
@@ -46,12 +67,13 @@ helpers do
     return [] unless ldap.bind
 
     users = []
-    filter = Net::LDAP::Filter.eq('objectClass', 'inetOrgPerson')
-    ldap.search(base: BASE_DN, filter: filter) do |entry|
-      next if entry.dn.include?('read-only-admin')
+    filter = Net::LDAP::Filter.eq('objectClass', 'user')
+    ldap.search(base: BASE_DN, filter: filter, size: 50) do |entry|
+      sam = entry.respond_to?(:sAMAccountName) ? entry.sAMAccountName.first : nil
+      next unless sam
       users << {
         dn: entry.dn,
-        uid: entry.respond_to?(:uid) ? entry.uid.first : 'N/A',
+        uid: sam,
         cn: entry.respond_to?(:cn) ? entry.cn.first : 'N/A',
         mail: entry.respond_to?(:mail) ? entry.mail.first : 'N/A',
         sn: entry.respond_to?(:sn) ? entry.sn.first : 'N/A',
@@ -66,13 +88,13 @@ helpers do
     return [] unless ldap.bind
 
     groups = []
-    filter = Net::LDAP::Filter.eq('objectClass', 'groupOfUniqueNames')
-    ldap.search(base: BASE_DN, filter: filter) do |entry|
-      members = entry.respond_to?(:uniqueMember) ? entry.uniqueMember : []
+    filter = Net::LDAP::Filter.eq('objectClass', 'group')
+    ldap.search(base: BASE_DN, filter: filter, size: 50) do |entry|
+      members = entry.respond_to?(:member) ? entry.member : []
       groups << {
         dn: entry.dn,
         cn: entry.respond_to?(:cn) ? entry.cn.first : 'N/A',
-        members: members.map { |m| m.match(/uid=([^,]+)/)[1] rescue m }
+        members: members.map { |m| m.match(/CN=([^,]+)/i)[1] rescue m }
       }
     end
     groups
@@ -82,7 +104,7 @@ helpers do
     ldap = ldap_admin
     return nil unless ldap.bind
 
-    filter = Net::LDAP::Filter.eq('uid', uid)
+    filter = Net::LDAP::Filter.eq('sAMAccountName', uid)
     result = nil
     ldap.search(base: BASE_DN, filter: filter) do |entry|
       attrs = {}
@@ -148,7 +170,7 @@ post '/login' do
     @success = "Authentification reussie en tant que #{uid} !"
 
     # Récupérer les infos de l'utilisateur connecté
-    filter = Net::LDAP::Filter.eq('uid', uid)
+    filter = Net::LDAP::Filter.eq('sAMAccountName', uid)
     ldap.search(base: BASE_DN, filter: filter) do |entry|
       session[:user_cn] = entry.cn.first if entry.respond_to?(:cn)
       session[:user_mail] = entry.mail.first if entry.respond_to?(:mail)
@@ -185,11 +207,11 @@ get '/search' do
     if ldap.bind
       filter = Net::LDAP::Filter.contains('cn', @query) |
                Net::LDAP::Filter.contains('mail', @query) |
-               Net::LDAP::Filter.eq('uid', @query)
-      ldap.search(base: BASE_DN, filter: filter) do |entry|
+               Net::LDAP::Filter.eq('sAMAccountName', @query)
+      ldap.search(base: BASE_DN, filter: filter, size: 50) do |entry|
         @results << {
           dn: entry.dn,
-          uid: entry.respond_to?(:uid) ? entry.uid.first : 'N/A',
+          uid: entry.respond_to?(:sAMAccountName) ? entry.sAMAccountName.first : 'N/A',
           cn: entry.respond_to?(:cn) ? entry.cn.first : 'N/A',
           mail: entry.respond_to?(:mail) ? entry.mail.first : 'N/A'
         }

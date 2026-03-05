@@ -1,6 +1,6 @@
-LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu x86_64-linux-gnu-pkg-config --exists openssl
-LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu x86_64-linux-gnu-pkg-config --libs openssl |
-=> "-lssl -lcrypto \n"
+package configuration for openssl is not found
+have_library: checking for BIO_read() in -llibcrypto... -------------------- no
+
 LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I. -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed     -lruby-3.1  -lm  -lc"
 checked program was:
 /* begin */
@@ -12,32 +12,154 @@ checked program was:
 6: }
 /* end */
 
-LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I. -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed     -lruby-3.1 -lssl -lcrypto -lm  -lc"
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I. -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed     -lruby-3.1 -llibcrypto  -lm  -lc"
+conftest.c: In function ‘t’:
+conftest.c:14:57: error: ‘BIO_read’ undeclared (first use in this function)
+   14 | int t(void) { void ((*volatile p)()); p = (void ((*)()))BIO_read; return !p; }
+      |                                                         ^~~~~~~~
+conftest.c:14:57: note: each undeclared identifier is reported only once for each function it appears in
 checked program was:
 /* begin */
-1: #include "ruby.h"
-2: 
-3: int main(int argc, char **argv)
-4: {
-5:   return !!argv[argc];
-6: }
+ 1: #include "ruby.h"
+ 2: 
+ 3: /*top*/
+ 4: extern int t(void);
+ 5: int main(int argc, char **argv)
+ 6: {
+ 7:   if (argc > 1000000) {
+ 8:     int (* volatile tp)(void)=(int (*)(void))&t;
+ 9:     printf("%d", (*tp)());
+10:   }
+11: 
+12:   return !!argv[argc];
+13: }
+14: int t(void) { void ((*volatile p)()); p = (void ((*)()))BIO_read; return !p; }
 /* end */
 
-LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu x86_64-linux-gnu-pkg-config --cflags-only-I openssl |
-=> "\n"
-LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu x86_64-linux-gnu-pkg-config --cflags-only-other openssl |
-=> "\n"
-LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu x86_64-linux-gnu-pkg-config --libs-only-l openssl |
-=> "-lssl -lcrypto \n"
-package configuration for openssl
-incflags: 
-cflags: 
-ldflags: 
-libs: -lssl -lcrypto
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I. -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed     -lruby-3.1 -llibcrypto  -lm  -lc"
+/usr/bin/ld : ne peut pas trouver -llibcrypto : Aucun fichier ou dossier de ce type
+/usr/bin/ld : notez que pour éditer les liens avec /usr/lib/x86_64-linux-gnu/libcrypto.a il faut utiliser -l:libcrypto.a ou le renommer en liblibcrypto.a
+collect2: error: ld returned 1 exit status
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: /*top*/
+ 4: extern int t(void);
+ 5: int main(int argc, char **argv)
+ 6: {
+ 7:   if (argc > 1000000) {
+ 8:     int (* volatile tp)(void)=(int (*)(void))&t;
+ 9:     printf("%d", (*tp)());
+10:   }
+11: 
+12:   return !!argv[argc];
+13: }
+14: extern void BIO_read();
+15: int t(void) { BIO_read(); return 0; }
+/* end */
+
+--------------------
+
+have_library: checking for BIO_read() in -lcrypto... -------------------- yes
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I. -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed     -lruby-3.1 -lcrypto  -lm  -lc"
+conftest.c: In function ‘t’:
+conftest.c:14:57: error: ‘BIO_read’ undeclared (first use in this function)
+   14 | int t(void) { void ((*volatile p)()); p = (void ((*)()))BIO_read; return !p; }
+      |                                                         ^~~~~~~~
+conftest.c:14:57: note: each undeclared identifier is reported only once for each function it appears in
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: /*top*/
+ 4: extern int t(void);
+ 5: int main(int argc, char **argv)
+ 6: {
+ 7:   if (argc > 1000000) {
+ 8:     int (* volatile tp)(void)=(int (*)(void))&t;
+ 9:     printf("%d", (*tp)());
+10:   }
+11: 
+12:   return !!argv[argc];
+13: }
+14: int t(void) { void ((*volatile p)()); p = (void ((*)()))BIO_read; return !p; }
+/* end */
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I. -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed     -lruby-3.1 -lcrypto  -lm  -lc"
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: /*top*/
+ 4: extern int t(void);
+ 5: int main(int argc, char **argv)
+ 6: {
+ 7:   if (argc > 1000000) {
+ 8:     int (* volatile tp)(void)=(int (*)(void))&t;
+ 9:     printf("%d", (*tp)());
+10:   }
+11: 
+12:   return !!argv[argc];
+13: }
+14: extern void BIO_read();
+15: int t(void) { BIO_read(); return 0; }
+/* end */
+
+--------------------
+
+have_library: checking for SSL_CTX_new() in -lssl... -------------------- yes
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I. -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed    -lcrypto  -lruby-3.1 -lssl -lcrypto  -lm  -lc"
+conftest.c: In function ‘t’:
+conftest.c:14:57: error: ‘SSL_CTX_new’ undeclared (first use in this function)
+   14 | int t(void) { void ((*volatile p)()); p = (void ((*)()))SSL_CTX_new; return !p; }
+      |                                                         ^~~~~~~~~~~
+conftest.c:14:57: note: each undeclared identifier is reported only once for each function it appears in
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: /*top*/
+ 4: extern int t(void);
+ 5: int main(int argc, char **argv)
+ 6: {
+ 7:   if (argc > 1000000) {
+ 8:     int (* volatile tp)(void)=(int (*)(void))&t;
+ 9:     printf("%d", (*tp)());
+10:   }
+11: 
+12:   return !!argv[argc];
+13: }
+14: int t(void) { void ((*volatile p)()); p = (void ((*)()))SSL_CTX_new; return !p; }
+/* end */
+
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I. -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed    -lcrypto  -lruby-3.1 -lssl -lcrypto  -lm  -lc"
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: /*top*/
+ 4: extern int t(void);
+ 5: int main(int argc, char **argv)
+ 6: {
+ 7:   if (argc > 1000000) {
+ 8:     int (* volatile tp)(void)=(int (*)(void))&t;
+ 9:     printf("%d", (*tp)());
+10:   }
+11: 
+12:   return !!argv[argc];
+13: }
+14: extern void SSL_CTX_new();
+15: int t(void) { SSL_CTX_new(); return 0; }
+/* end */
+
+--------------------
 
 have_header: checking for openssl/bio.h... -------------------- yes
 
-LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I.  -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC    -c conftest.c"
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I. -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC   -c conftest.c"
 checked program was:
 /* begin */
 1: #include "ruby.h"
@@ -49,7 +171,7 @@ checked program was:
 
 have_func: checking for DTLS_method() in openssl/ssl.h... -------------------- yes
 
-LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I.  -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC  conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed      -lssl -lcrypto -lruby-3.1  -lssl -lcrypto -lm  -lc"
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I. -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed    -lssl -lcrypto  -lruby-3.1 -lssl -lcrypto  -lm  -lc"
 checked program was:
 /* begin */
  1: #include "ruby.h"
@@ -74,7 +196,7 @@ checked program was:
 
 have_func: checking for SSL_CTX_set_session_cache_mode(NULL, 0) in openssl/ssl.h... -------------------- yes
 
-LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I.  -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC  conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed      -lssl -lcrypto -lruby-3.1  -lssl -lcrypto -lm  -lc"
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I. -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed    -lssl -lcrypto  -lruby-3.1 -lssl -lcrypto  -lm  -lc"
 checked program was:
 /* begin */
  1: #include "ruby.h"
@@ -100,7 +222,7 @@ checked program was:
 
 have_func: checking for TLS_server_method() in openssl/ssl.h... -------------------- yes
 
-LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I.  -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC  conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed      -lssl -lcrypto -lruby-3.1  -lssl -lcrypto -lm  -lc"
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I. -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed    -lssl -lcrypto  -lruby-3.1 -lssl -lcrypto  -lm  -lc"
 checked program was:
 /* begin */
  1: #include "ruby.h"
@@ -125,7 +247,7 @@ checked program was:
 
 have_func: checking for SSL_CTX_set_min_proto_version(NULL, 0) in openssl/ssl.h... -------------------- yes
 
-LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I.  -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC  conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed      -lssl -lcrypto -lruby-3.1  -lssl -lcrypto -lm  -lc"
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I. -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed    -lssl -lcrypto  -lruby-3.1 -lssl -lcrypto  -lm  -lc"
 checked program was:
 /* begin */
  1: #include "ruby.h"
@@ -151,7 +273,7 @@ checked program was:
 
 have_func: checking for SSL_CTX_set_dh_auto(NULL, 0) in openssl/ssl.h... -------------------- yes
 
-LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I.  -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC  conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed      -lssl -lcrypto -lruby-3.1  -lssl -lcrypto -lm  -lc"
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I. -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed    -lssl -lcrypto  -lruby-3.1 -lssl -lcrypto  -lm  -lc"
 checked program was:
 /* begin */
  1: #include "ruby.h"
@@ -177,7 +299,7 @@ checked program was:
 
 have_func: checking for SSL_CTX_set_ciphersuites(NULL, "") in openssl/ssl.h... -------------------- yes
 
-LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I.  -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC  conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed      -lssl -lcrypto -lruby-3.1  -lssl -lcrypto -lm  -lc"
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I. -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed    -lssl -lcrypto  -lruby-3.1 -lssl -lcrypto  -lm  -lc"
 checked program was:
 /* begin */
  1: #include "ruby.h"
@@ -203,7 +325,7 @@ checked program was:
 
 have_func: checking for SSL_get1_peer_certificate() in openssl/ssl.h... -------------------- yes
 
-LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I.  -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC  conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed      -lssl -lcrypto -lruby-3.1  -lssl -lcrypto -lm  -lc"
+LD_LIBRARY_PATH=.:/usr/lib/x86_64-linux-gnu "x86_64-linux-gnu-gcc -o conftest -I/usr/include/x86_64-linux-gnu/ruby-3.1.0 -I/usr/include/ruby-3.1.0/ruby/backward -I/usr/include/ruby-3.1.0 -I. -Wdate-time -D_FORTIFY_SOURCE=2   -g -O2 -ffile-prefix-map=BUILDDIR=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC conftest.c  -L. -L/usr/lib/x86_64-linux-gnu -L. -Wl,-z,relro -Wl,-z,now -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed    -lssl -lcrypto  -lruby-3.1 -lssl -lcrypto  -lm  -lc"
 checked program was:
 /* begin */
  1: #include "ruby.h"
