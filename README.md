@@ -10,6 +10,8 @@ Ce projet a pour objectif de se familiariser avec le protocole LDAP (Lightweight
 2. [Étape 1 : Raccordement au serveur de test public](#2-étape-1--raccordement-au-serveur-de-test-public)
 3. [Étape 2 : Raccordement au LDAP de l'Université de Lorraine](#3-étape-2--raccordement-au-ldap-de-luniversité-de-lorraine)
 4. [Instructions d'installation et d'utilisation](#4-instructions-dinstallation-et-dutilisation)
+5. [Étape 3 : Déploiement d'une application existante (BookStack)](#5-étape-3--déploiement-dune-application-existante-bookstack)
+6. [Étape 4 : Documentation des difficultés rencontrées](#6-étape-4--documentation-des-difficultés-rencontrées)
 
 ---
 
@@ -299,3 +301,16 @@ Une fois BookStack lancé, connectez-vous avec :
 - **Mot de passe** : Votre mot de passe UL.
 
 Le profil se créera automatiquement en reprenant votre "displayName" (nom affiché) et votre "mail" configuré dans l'Active Directory.
+
+## 6. Étape 4 : Documentation des difficultés rencontrées
+
+Conformément aux travaux demandés, voici une synthèse des difficultés rencontrées lors du raccordement LDAP :
+
+- **Certificat TLS** : Le certificat de l'UL n'est pas reconnu par défaut.
+    - *Solution* : Utilisation de `LDAP_TLS_INSECURE=true` en développement.
+- **Format du DN de bind** : L'Active Directory refuse le format DN classique.
+    - *Solution* : Utilisation du format UPN (`login@univ-lorraine.fr`).
+- **Filtre utilisateur** : Nécessité d'utiliser `sAMAccountName` (et non `uid` ou `cn`) pour le login UL.
+- **Identifiant Unique** : Utilisation de `objectGUID` pour éviter les doublons en cas de changement de login.
+- **Connectivité réseau** : Le serveur LDAP n'est accessible que via le réseau de l'UL ou le VPN.
+

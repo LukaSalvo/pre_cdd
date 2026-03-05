@@ -15,27 +15,27 @@ services:
       - DB_PASS=${DB_PASS:-bookstack_pass}
       - DB_PASSWORD=${DB_PASS:-bookstack_pass}
       - DB_DATABASE=${DB_DATABASE:-bookstackapp}
-      # LDAP Authentication Configuration
-      - AUTH_METHOD=standard
 
-      # Configuration LDAP
+      # --- Authentification LDAP (Active Directory UL) ---
+      - AUTH_METHOD=ldap
+      - LDAP_SERVER=ldaps://montet-dc1.ad.univ-lorraine.fr:636
+      - LDAP_BASE_DN=OU=Personnels,OU=_Utilisateurs,OU=UL,DC=ad,DC=univ-lorraine,DC=fr
       - LDAP_DN=${LDAP_DN}
       - LDAP_PASS=${LDAP_PASS}
       - LDAP_VERSION=3
-      - LDAP_TLS_CA_CERT=/config/ul-ca.crt
-      - LDAP_TLS_INSECURE=true
-      - LDAP_USER_FILTER=(&(objectClass=user)(sAMAccountName=$${user}))
-      - LDAP_ID_ATTRIBUTE=sAMAccountName
+      - LDAP_USER_FILTER=(&(objectClass=user)(sAMAccountName=$${input}))
+      - LDAP_ID_ATTRIBUTE=objectGUID
       - LDAP_EMAIL_ATTRIBUTE=mail
       - LDAP_DISPLAY_NAME_ATTRIBUTE=displayName
 
-      # Options de certificat : Option B par defaut (INSECURE) pour dev
+      # --- Certificat TLS ---
+      # Option B (développement) : ignorer la vérification du certificat
       - LDAP_TLS_INSECURE=${LDAP_TLS_INSECURE:-true}
-      # Si Option A: de-commenter la ligne cd-dessous et commenter la ligne au dessus
+      # Option A (production) : fournir le certificat CA de l'UL
       #- LDAP_TLS_CA_CERT=/config/ul-ca.crt
     volumes:
       - ./bookstack_data:/config
-      # Si Option A, décommenter la ligne ci-dessous :
+      # Option A : décommenter pour monter le certificat CA
       #- ./ul-ca.crt:/config/ul-ca.crt:ro
     ports:
       - "6875:80"
