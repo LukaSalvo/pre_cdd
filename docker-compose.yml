@@ -17,7 +17,7 @@ services:
       - DB_DATABASE=${DB_DATABASE:-bookstackapp}
 
       # --- Authentification LDAP (Active Directory UL) ---
-      - AUTH_METHOD=ldap
+      - AUTH_METHOD=standard
       - LDAP_SERVER=ldaps://montet-dc1.ad.univ-lorraine.fr:636
       - LDAP_BASE_DN=OU=Personnels,OU=_Utilisateurs,OU=UL,DC=ad,DC=univ-lorraine,DC=fr
       - LDAP_DN=${LDAP_DN}
