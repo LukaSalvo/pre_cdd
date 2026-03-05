@@ -120,7 +120,7 @@ ldapsearch -x -H ldap://ldap.forumsys.com -b "dc=example,dc=com" -D "uid=tesla,d
 - `-D` : DN du compte utilisé pour le bind
 - `-w` : mot de passe
 
-### 2.3. Script Ruby (`ldap_public_test.rb`)
+### 2.3. Script Ruby (`scripts/ldap_public_test.rb`)
 
 Le script de test effectue les opérations suivantes :
 1. **Bind admin** : connexion avec le compte `read-only-admin`
@@ -178,7 +178,7 @@ ldapsearch -x -H ldaps://montet-dc1.ad.univ-lorraine.fr:636 \
 | **Scope** | Annuaire plat | Arborescence hiérarchique multi-OU |
 | **Mot de passe** | Hardcodé (`password`) | Identifiants réels → **jamais dans le code** |
 
-### 3.4. Script PoC (`ldap_univ_poc.rb`)
+### 3.4. Script PoC (`scripts/ldap_univ_poc.rb`)
 
 Le script de proof of concept permet :
 1. **Connexion sécurisée (LDAPS)** au serveur de l'UL avec failover automatique entre les 2 serveurs
@@ -207,26 +207,53 @@ Le fichier `.env` est ajouté au `.gitignore` pour ne jamais être versionné.
 - **Bundler** : `gem install bundler` si non installé
 - **ldapsearch** : `sudo apt install ldap-utils` (pour les tests CLI)
 
-### 4.2. Installation
+### 4.2. Structure du projet
+
+```
+pre_cdd/
+├── .env.example              # Template de configuration
+├── .gitignore
+├── README.md
+├── docker-compose.yml        # BookStack + MariaDB (étape 3)
+├── docs/
+│   ├── sujet.pdf             # Sujet du projet
+│   └── sujet.txt
+├── scripts/
+│   ├── Gemfile               # Dépendances Ruby pour les scripts CLI
+│   ├── ldap_public_test.rb   # Étape 1 — raccordement serveur de test
+│   ├── ldap_univ_poc.rb      # Étape 2 — PoC LDAP UL
+│   └── login_ul.php          # PoC PHP (complémentaire)
+└── ldap_web_app/
+    ├── Gemfile               # Dépendances Ruby pour l'app web
+    ├── app.rb                # Application Sinatra
+    ├── public/style.css      # Styles CSS
+    └── views/                # Templates ERB
+```
+
+### 4.3. Installation
 
 ```bash
 # Cloner le dépôt
 git clone <url_du_depot>
 cd pre_cdd
 
-# Installer les dépendances Ruby
-bundle install
+# Installer les dépendances des scripts CLI
+cd scripts && bundle install && cd ..
+
+# Installer les dépendances de l'app web
+cd ldap_web_app && bundle install && cd ..
 ```
 
-### 4.3. Exécution du test public (Étape 1)
+### 4.4. Exécution du test public (Étape 1)
 
 ```bash
+cd scripts
 ruby ldap_public_test.rb
 ```
 
 Ce script ne nécessite aucune configuration, il se connecte directement au serveur public de test.
 
-### 4.4. Exécution du PoC Université (Étape 2)
+### 4.5. Exécution du PoC Université (Étape 2)
 
 **Méthode 1 : Fichier `.env` (recommandé)**
 ```bash
@@ -237,17 +264,14 @@ cp .env.example .env
 nano .env
 
 # Exécuter le script
+cd scripts
 ruby ldap_univ_poc.rb
 ```
 
 **Méthode 2 : Variables inline**
 ```bash
+cd scripts
 LDAP_USERNAME='votre_login' LDAP_PASSWORD='votre_mdp' ruby ldap_univ_poc.rb
-```
-
-**Options :**
-```bash
-LDAP_USERNAME='votre_login' LDAP_PASSWORD='votre_mot_de_passe' ruby ldap_univ_poc.rb
 ```
 
 ## 5. Étape 3 : Déploiement d'une application existante (BookStack)

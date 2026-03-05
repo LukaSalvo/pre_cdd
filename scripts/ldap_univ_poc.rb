@@ -3,7 +3,8 @@
 # Étape 2 du projet : Connexion sécurisée LDAPS et recherche dans l'annuaire
 
 require 'net/ldap'
-require 'dotenv/load'
+require 'dotenv'
+Dotenv.load(File.join(__dir__, '..', '.env'))
 
 # --- Configuration ---
 
