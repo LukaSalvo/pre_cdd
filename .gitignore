@@ -1,5 +1,38 @@
-Gemfile.lock
+# === Fichiers sensibles ===
 .env
+
+# === Dépendances Ruby (bundle) ===
+vendor/
+.bundle/
+ldap_web_app/vendor/
+ldap_web_app/.bundle/
+Gemfile.lock
+ldap_web_app/Gemfile.lock
+scripts/vendor/
+scripts/.bundle/
+scripts/Gemfile.lock
+
+# === Données Docker (volumes) ===
+bookstack_data/
+db_data/
+
+# === Certificats ===
+*.crt
+*.pem
+*.key
+
+# === Fichiers éditeur / OS ===
 *.swp
 *.swo
 *~
+.DS_Store
+Thumbs.db
+*.bak
+
+# === Logs ===
+*.log
+
+# === IDE ===
+.vscode/
+.idea/
+*.code-workspace

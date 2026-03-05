@@ -1,1 +1,0 @@
-2026/03/05 09:11:29 [error] 293#293: *30 upstream timed out (110: Operation timed out) while reading response header from upstream, client: 172.20.0.1, server: _, request: "POST /login HTTP/1.1", upstream: "fastcgi://127.0.0.1:9000", host: "localhost:6875", referrer: "http://localhost:6875/login"
