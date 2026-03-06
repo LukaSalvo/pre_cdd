@@ -31,9 +31,9 @@ admin_ldap = Net::LDAP.new(
 )
 
 if admin_ldap.bind
-  puts "✓ Authentification admin reussie"
+  puts "Authentification admin reussie"
 else
-  puts "✗ Echec de l'authentification admin: #{admin_ldap.get_operation_result.message}"
+  puts "Echec de l'authentification admin: #{admin_ldap.get_operation_result.message}"
   exit 1
 end
 
@@ -112,7 +112,7 @@ test_users.each do |user|
   )
 
   if user_ldap.bind
-    puts "  ✓ #{user[:description]} (#{user_dn}) : authentification reussie"
+    puts "  #{user[:description]} (#{user_dn}) : authentification reussie"
 
     # Recherche des infos de cet utilisateur
     filter = Net::LDAP::Filter.eq('uid', user[:uid])
@@ -121,7 +121,7 @@ test_users.each do |user|
       puts "    Tel: #{entry.telephoneNumber.first}" if entry.respond_to?(:telephoneNumber) && entry.telephoneNumber
     end
   else
-    puts "  ✗ #{user[:description]} (#{user_dn}) : echec - #{user_ldap.get_operation_result.message}"
+    puts "  #{user[:description]} (#{user_dn}) : echec - #{user_ldap.get_operation_result.message}"
   end
 end
 

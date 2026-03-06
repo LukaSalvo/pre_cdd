@@ -9,14 +9,14 @@
 <body>
   <nav class="navbar">
     <div class="nav-brand">
-      <span class="nav-icon">📖</span>
+      <span class="nav-icon">Annuaire</span>
       <a href="/">LDAP Explorer</a>
     </div>
     <div class="nav-links">
       <a href="/" class="nav-link">Annuaire</a>
       <a href="/search" class="nav-link">Recherche</a>
       <% if logged_in? %>
-        <span class="nav-user">👤 <%= h(session[:user_cn] || current_user) %></span>
+        <span class="nav-user">User: <%= h(session[:user_cn] || current_user) %></span>
         <a href="/logout" class="nav-link btn-logout">Déconnexion</a>
       <% else %>
         <a href="/login" class="nav-link btn-login">Connexion</a>

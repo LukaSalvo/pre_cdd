@@ -80,10 +80,10 @@ def connect_ldap(username, password)
     )
 
     if ldap.bind
-      puts "✓ Connecte a #{server} en tant que #{username}"
+      puts "Connecte a #{server} en tant que #{username}"
       return ldap
     else
-      puts "✗ Echec sur #{server}: #{ldap.get_operation_result.message}"
+      puts "Echec sur #{server}: #{ldap.get_operation_result.message}"
     end
   end
 
@@ -177,4 +177,4 @@ if count.zero? && BASE_DN_USERS != BASE_DN_STAFF
 end
 
 puts
-puts '✓ Script termine.'
+puts 'Script termine.'

@@ -70,7 +70,7 @@ Les composants principaux du DN :
 | **Sécurité** | Les identifiants transitent en clair | Échanges entièrement chiffrés |
 | **Usage** | Tests, environnements internes isolés | **Obligatoire en production** |
 
-> ⚠️ **Important** : L'utilisation de LDAPS est impérative dès qu'il y a transmission d'identifiants réels. Un bind LDAP sur le port 389 expose le mot de passe en clair sur le réseau.
+> **Important** : L'utilisation de LDAPS est impérative dès qu'il y a transmission d'identifiants réels. Un bind LDAP sur le port 389 expose le mot de passe en clair sur le réseau.
 
 ### 1.5. Cas d'usage en entreprise
 
@@ -326,15 +326,46 @@ Une fois BookStack lancé, connectez-vous avec :
 
 Le profil se créera automatiquement en reprenant votre "displayName" (nom affiché) et votre "mail" configuré dans l'Active Directory.
 
-## 6. Étape 4 : Documentation des difficultés rencontrées
+## 6. Étape 4 : Documentation des difficultés et résumé du travail
 
-Conformément aux travaux demandés, voici une synthèse des difficultés rencontrées lors du raccordement LDAP :
+### 6.1. Résumé des travaux réalisés
 
-- **Certificat TLS** : Le certificat de l'UL n'est pas reconnu par défaut.
-    - *Solution* : Utilisation de `LDAP_TLS_INSECURE=true` en développement.
-- **Format du DN de bind** : L'Active Directory refuse le format DN classique.
-    - *Solution* : Utilisation du format UPN (`login@univ-lorraine.fr`).
-- **Filtre utilisateur** : Nécessité d'utiliser `sAMAccountName` (et non `uid` ou `cn`) pour le login UL.
-- **Identifiant Unique** : Utilisation de `objectGUID` pour éviter les doublons en cas de changement de login.
-- **Connectivité réseau** : Le serveur LDAP n'est accessible que via le réseau de l'UL ou le VPN.
+Au cours de ce projet, les actions suivantes ont été menées et terminées avec succès :
+
+1.  **Exploration LDAP initiale (Étape 1)** :
+    *   Connexion au serveur public `ldap.forumsys.com`.
+    *   Script Ruby `scripts/ldap_public_test.rb` écrit et documenté. tests de `bind` simple et filtres.
+
+2.  **Raccordement au LDAP Université de Lorraine (Étape 2)** :
+    *   Script PoC `scripts/ldap_univ_poc.rb` utilisant `LDAPS` (port 636) avec le certificat UL.
+    *   Identification de l'architecture AD : utilisation de `sAMAccountName` (login) au lieu de `uid`.
+    *   Filtres avancés pour isoler les étudiants/personnels avec les groupes (`memberOf`).
+    *   Sécurisation du mot de passe avec l'implémentation de `dotenv` et un fichier `.env` non suivi dans Git.
+
+3.  **Application Web Sinatra** :
+    *   Une application Ruby (Sinatra) a été développée dans `ldap_web_app/`.
+    *   Connexion sécurisée en LDAPS pour consulter l'annuaire de l'Université directement depuis une interface web (recherche par nom, affichage des groupes et utilisateurs).
+
+4.  **Déploiement Docker BookStack (Étape 3)** :
+    *   Configuration d'un fichier `docker-compose.yml` complet pour BookStack et MariaDB.
+    *   `AUTH_METHOD` paramétré sur `ldap` avec mappage des variables LDAP vers l'AD de l'Université.
+    *   Correctifs syntaxiques cruciaux comme l'utilisation de `LDAP_USER_FILTER=(&(objectClass=user)(sAMAccountName=$${user}))` pour la compatibilité avec BookStack et Docker Compose.
+    *   Application des identifiants stockés de manière sécurisée et dynamique depuis le fichier `.env`.
+
+5.  **Qualité et architecture du dépôt** :
+    *   Nettoyage complet du dépôt Git (`.gitignore` exhaustif, exclusion de centaines de dépendances Ruby inutiles et artefacts Docker).
+    *   Structure organisée avec des chemises dédiées pour la documentation (`docs/`), les scripts CLI (`scripts/`) et l'application Web principale (`ldap_web_app/`).
+    *   Documentation systématique et détaillée dans le présent fichier.
+
+### 6.2. Difficultés rencontrées
+
+Conformément aux attentes du projet, voici une synthèse des difficultés rencontrées lors du raccordement LDAP :
+
+- **Certificat TLS** : Le certificat de l'UL n'est pas reconnu par défaut par les bibliothèques et conteneurs Linux standards.
+    - *Solution* : Utilisation de `LDAP_TLS_INSECURE=true` en développement (ou injection locale du certificat CA).
+- **Format du DN de bind** : L'Active Directory refuse un format DN classique simple dans certains cas.
+    - *Solution* : Utilisation forte du format UPN ciblé sur le domaine (`login@etu.univ-lorraine.fr`).
+- **Filtre utilisateur BookStack** : Le paramètre attendu est spécifique à l'Active Directory, nécessitant `sAMAccountName` (et non `uid` ou `cn`). Par ailleurs, l'échappement Docker Compose nécessite `$${user}` au lieu de `${user}`.
+- **Identifiant Unique AD** : Lors du couplage avec des applications tierces (ex: BookStack), l'attribut `objectGUID` est le seul garant de l'unicité et de la persistance en cas de changement de login UL.
+- **Connectivité réseau** : Les pare-feux bloquent le port LDAP(S) selon les réseaux, rendant indispensable l'exécution du code sur le VPN universitaire ou via Eduroam.
 
